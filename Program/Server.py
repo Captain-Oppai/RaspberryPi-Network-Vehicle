@@ -1,6 +1,4 @@
 # ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-# This project is meant to run on the 'host', 'server', or 'master' and is used to start up the initial connection and send commands to the swarms in question.
-# ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # Author: Captain Oppai
 # Author Discord: Jisatsu#1987
 # Github Project Repo: https://github.com/Zachry117/RaspberryPi-Network-Vehicle
@@ -15,9 +13,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 # ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+# File description and information:
+#
+# This project is meant to run on the 'host', 'server', or 'master' and is used to start up the initial connection and send commands to the swarms in question.
+# ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 import socket
 import pickle
+import time
 
 # If you'd prefer you can always change the port (There may be some rules on what the port range is but I forgot)
 # You shouldn't mess with the host variable as the server should bind with it's own ip address.
@@ -44,6 +47,7 @@ def serverProgram():
         if data.lower().strip() == 'bye':
             print("Goodbye!")
             conn.send(data.encode())
+            time.sleep(1)
             conn.close()
             exit()
 

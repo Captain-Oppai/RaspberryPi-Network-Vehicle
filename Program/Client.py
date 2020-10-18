@@ -1,10 +1,4 @@
 # ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-# This file is meant to be ran on the 'guest', 'client', or 'slave' and contains all the commands 
-# and the 'help' table which is sent to the server in the event of a help command recieved.
-#
-# This file also maintains the connection with the server and obediently waits for commands, responding with appropriate phrases on completion or returning 'Invalid command'
-# in the event of a command being recieved that is not in the local command list.
-# ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # Author: Captain Oppai
 # Author Discord: Jisatsu#1987
 # Github Project Repo: https://github.com/Zachry117/RaspberryPi-Network-Vehicle
@@ -18,6 +12,14 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+# File description and information:
+#
+# This file is meant to be ran on the 'guest', 'client', or 'slave' and contains all the commands 
+# and the 'help' table which is sent to the server in the event of a help command recieved.
+#
+# This file also maintains the connection with the server and obediently waits for commands, responding with appropriate phrases on completion or returning 'Invalid command'
+# in the event of a command being recieved that is not in the local command list.
 # ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 import socket
@@ -39,7 +41,9 @@ robotName = 'Robo Boi!'
 help = [
     'bye',
     'forward', 
-    'backwards'
+    'backwards',
+    'right',
+    'left'
     ]
 
 # Establishing the connection to the server as well as making a socket variable.
@@ -51,6 +55,8 @@ print("Connected to server!")
 unknown = 'Invalid command!'
 forwardMsg = 'Going forward, Boss!'
 backwardsMsg = 'Going backwards, Boss!'
+rightMsg = 'Going right, Boss!'
+leftMsg = 'Going left, Boss!'
 
 # Simple send function, this will combine the robot's name and the appropriate command message (the cmd variable is the string you'd like to send back to the server.)
 def send(cmd):
@@ -60,11 +66,19 @@ def send(cmd):
 # These will be the movement commands/functions and any other commands/functions that will be required besides movement.
 def forward():
     # There will be more added eventually when I have the motors and have the documentation and modules to use.
-    print('Going forward, Boss!')
+    print(forwardMsg)
 
 def backwards():
     # There will be more added eventually when I have the motors and have the documentation and modules to use.
-    print('Going backwards, Boss!')
+    print(backwardsMsg)
+
+def right():
+    # There will be more added eventually when I have the motors and have the documentation and modules to use.
+    print(rightMsg)
+
+def left():
+    # There will be more added eventually when I have the motors and have the documentation and modules to use.
+    print(leftMsg)
 
 def clientProgram():
     # Making a loop so that the client will constantly take commands.
@@ -81,7 +95,7 @@ def clientProgram():
         if data == "bye":
             print("Goodbye!")
             s.close()
-            break
+            exit()
 
         # This will just print out the recieved command.
         print("From server: " + str(data))
@@ -94,6 +108,16 @@ def clientProgram():
         if data.lower().strip() == 'backwards':
             backwards()
             send(backwardsMsg)
+            clientProgram()
+
+        if data.lower().strip() == 'right':
+            right()
+            send(rightMsg)
+            clientProgram()
+
+        if data.lower().strip() == 'left':
+            left()
+            send(leftMsg)
             clientProgram()
 
         # In the event of the help command being called we will be using the pickle module to dump our help array and send it over to the server where it is the loaded.
