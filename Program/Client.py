@@ -55,9 +55,6 @@ motor2 = GPIO.PWM(motor2enable, 100)
 
 speedInt = 0
 
-motor1.ChangeDutyCycle(speedInt)
-motor2.ChangeDutyCycle(speedInt)
-
 #   -Setting up the pins so they are ready to send signals out
 GPIO.setup(motor1a, GPIO.OUT)
 GPIO.setup(motor1b, GPIO.OUT)
@@ -65,6 +62,8 @@ GPIO.setup(motor2a, GPIO.OUT)
 GPIO.setup(motor2b, GPIO.OUT)
 GPIO.setup(motor1enable, GPIO.OUT)
 GPIO.setup(motor2enable, GPIO.OUT)
+
+GPIO.setup(14, GPIO.OUT)
 
 # This help array is sent to the server anytime the 'help' command is sent to the client. Add the commands you'd like to be displayed or don't, let the server user guess.
 help = [
@@ -110,6 +109,15 @@ def right():
 def left():
     # There will be more added eventually when I have the motors and have the documentation and modules to use.
     print(leftMsg)
+
+def light():
+    # Just testing a light on/off on raspberry pi.
+    GPIO.output(14, GPIO.HIGH)
+    print("On!")
+    sleep(5)
+    GPIO.output(14, GPIO.LOW)
+    print("Off!")
+
 
 def clientProgram():
     # Making a loop so that the client will constantly take commands.
@@ -175,3 +183,5 @@ def main():
     clientProgram()
 
 main()
+
+GPIO.cleanup()
