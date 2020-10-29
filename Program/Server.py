@@ -33,7 +33,7 @@ s.bind((host, port))
 s.listen(2)
 print("Server established, waiting for connection...")
 
-# Recieve the incoming connection and announce it.
+# Receive the incoming connection and announce it.
 conn, address = s.accept()
 print("Connection from: " + str(address))
 
@@ -41,7 +41,7 @@ print("Connection from: " + str(address))
 def serverProgram():
     while True:
         # This is where the user will input the command they want, this will be sent to the client as well.
-        data = input(' -> ')
+        data = input(' Command -> ')
 
         # This bye command will send 'bye' to the client and terminate the program.
         if data.lower().strip() == 'bye':
@@ -58,6 +58,20 @@ def serverProgram():
             help = pickle.loads(data)
             print(*help, sep = "\n") 
             serverProgram()
+
+        if data.lower().strip() == 'set speed':
+            print("What speed would you like? (1-100)")
+            speedInput = input(' Speed -> ')
+            speed = int(speedInput)
+            if 1 <= speed <= 100:
+                conn.send(data.encode())
+                conn.recv(1024)
+                conn.send(speedInput.encode())
+                conn.recv(1024)
+                serverProgram()
+            else:
+                print('Invalid value!')
+                serverProgram()
 
         # If there are no special server requirements it will send the command straight through to the client.
         conn.send(data.encode())

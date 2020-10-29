@@ -16,14 +16,16 @@
 # File description and information:
 #
 # This file is meant to be ran on the 'guest', 'client', or 'slave' and contains all the commands 
-# and the 'help' table which is sent to the server in the event of a help command recieved.
+# and the 'help' table which is sent to the server in the event of a help command received.
 #
 # This file also maintains the connection with the server and obediently waits for commands, responding with appropriate phrases on completion or returning 'Invalid command'
-# in the event of a command being recieved that is not in the local command list.
+# in the event of a command being received that is not in the local command list.
 # ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 import socket
 import pickle
+import RPi.GPIO as GPIO
+from time import sleep
 
 # Do note that the client is currently set up to work on a local system meaning that both server and client are being hosted on the same computer.
 # If you are to use this program on a external computer the host variable should be replaced with the remote server's IP address.
@@ -37,13 +39,41 @@ port = 8888
 # The robotName variable isn't important and can be anything you'd like, just putting this in for future use with multiple clients and identification is needed.
 robotName = 'Robo Boi!'
 
+# GPIO Setup for raspberry pi.
+GPIO.setmode(GPIO.BCM)
+
+#   -Assigning variables for the motor control pins and establishing PWM instances (replace these values with the pin # you're using on your setup.)
+motor1a = 0
+motor1b = 0
+motor1enable = 0
+motor1 = GPIO.PWM(motor1enable, 100)
+
+motor2a = 0
+motor2b = 0
+motor2enable = 0
+motor2 = GPIO.PWM(motor2enable, 100)
+
+speedInt = 0
+
+motor1.ChangeDutyCycle(speedInt)
+motor2.ChangeDutyCycle(speedInt)
+
+#   -Setting up the pins so they are ready to send signals out
+GPIO.setup(motor1a, GPIO.OUT)
+GPIO.setup(motor1b, GPIO.OUT)
+GPIO.setup(motor2a, GPIO.OUT)
+GPIO.setup(motor2b, GPIO.OUT)
+GPIO.setup(motor1enable, GPIO.OUT)
+GPIO.setup(motor2enable, GPIO.OUT)
+
 # This help array is sent to the server anytime the 'help' command is sent to the client. Add the commands you'd like to be displayed or don't, let the server user guess.
 help = [
     'bye',
-    'forward', 
+    'forward',
     'backwards',
     'right',
-    'left'
+    'left',
+    'set speed'
     ]
 
 # Establishing the connection to the server as well as making a socket variable.
@@ -53,6 +83,7 @@ print("Connected to server!")
 
 # These are variables used as reference for sending the server back a completion message.
 unknown = 'Invalid command!'
+received = 'Message received!'
 forwardMsg = 'Going forward, Boss!'
 backwardsMsg = 'Going backwards, Boss!'
 rightMsg = 'Going right, Boss!'
@@ -83,21 +114,21 @@ def left():
 def clientProgram():
     # Making a loop so that the client will constantly take commands.
     while True:
-        # Recieving the data from server and decoding it.
+        # Receiving the data from server and decoding it.
         print("Waiting for command...")
         data = s.recv(1024).decode()
 
         if not data:
             s.close()
             break
-        
+
         # This function along with the other move functions are just short blocks of if statements to either reference a different function or do something quickly like break the loop.
         if data == "bye":
             print("Goodbye!")
             s.close()
             exit()
 
-        # This will just print out the recieved command.
+        # This will just print out the received command.
         print("From server: " + str(data))
 
         if data.lower().strip() == 'forward':
@@ -120,12 +151,20 @@ def clientProgram():
             send(leftMsg)
             clientProgram()
 
+        if data.lower().strip() == 'set speed':
+            print('Setting speed!')
+            send(received)
+            speedData = s.recv(1024).decode()
+            speedInt = int(speedData)
+            send(received)
+            clientProgram()
+
         # In the event of the help command being called we will be using the pickle module to dump our help array and send it over to the server where it is the loaded.
         if data.lower().strip() == 'help':
             s.send(pickle.dumps(help))
             clientProgram()
 
-        # Seems self explanitory.
+        # Seems self explanatory.
         print("Invalid command!")
         send(unknown)
 
