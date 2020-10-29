@@ -46,12 +46,10 @@ GPIO.setmode(GPIO.BCM)
 motor1a = 0
 motor1b = 0
 motor1enable = 0
-motor1 = GPIO.PWM(motor1enable, 100)
 
 motor2a = 0
 motor2b = 0
 motor2enable = 0
-motor2 = GPIO.PWM(motor2enable, 100)
 
 speedInt = 0
 
@@ -62,6 +60,9 @@ GPIO.setup(motor2a, GPIO.OUT)
 GPIO.setup(motor2b, GPIO.OUT)
 GPIO.setup(motor1enable, GPIO.OUT)
 GPIO.setup(motor2enable, GPIO.OUT)
+
+motor1 = GPIO.PWM(motor1enable, 100)
+motor2 = GPIO.PWM(motor2enable, 100)
 
 GPIO.setup(14, GPIO.OUT)
 
@@ -167,6 +168,10 @@ def clientProgram():
             send(received)
             clientProgram()
 
+        if data.lower().strip() == 'light':
+            light()
+            send("Turning on the light boss!")
+            clientProgram()
         # In the event of the help command being called we will be using the pickle module to dump our help array and send it over to the server where it is the loaded.
         if data.lower().strip() == 'help':
             s.send(pickle.dumps(help))
